@@ -1,9 +1,8 @@
 const { Prisma } = require("@prisma/client");
+const logger = require("../utils/logger");
 
 function errorHandler(err, req, res, next) {
-  // !Uncomment this line to log the error details to the server console!
-    // console.error(err);
-  
+    logger.error(err);
     // error thrown by express.json() middleware when the request body is not valid JSON
     if (err.type === "entity.parse.failed")
       return res.status(400).json({

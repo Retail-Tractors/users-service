@@ -1,6 +1,7 @@
 const prisma = require("../config/db"); // Import prisma instance
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const logger = require("../utils/logger");
 const { sendMail } = require("../services/mail-sender");
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION;
@@ -164,6 +165,7 @@ async function changeUserRole(req, res, next) {
       where: { id: userId },
       data: { role: role.toUpperCase() },
     });
+    logger.info(`User role changed: ${userId} to ${role.toUpperCase()}\n by admin: ${req.user.id}`);
     return res.status(200).json({ data: updatedUser });
   } catch (error) {
     next(error);
@@ -183,6 +185,7 @@ async function deleteUser(req, res, next) {
     }
 
     await prisma.user.delete({ where: { id: userId } });
+    logger.info(`User deleted: ${userId} by admin: ${req.user.id}`);
     return res.status(204).send();
   } catch (error) {
     next(error);
