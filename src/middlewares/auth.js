@@ -12,16 +12,6 @@ function authenticateToken(req, res, next) {
         next();
     });
 }
-// function that will make the request fail with 403 if role is not permitted
-function authorizeRole(role) {
-    return (req, res, next) => {
-        if (req.user.role !== role.toUpperCase()) {
-            return res.status(403).json({ error: "Access forbidden: insufficient privileges." });
-        }
-        next();
-    };
-}
-
 function checkUserIDMatch(req, res, next) {
     const userId = parseInt(req.params.id);
     if (req.user.id !== userId) {
@@ -30,4 +20,4 @@ function checkUserIDMatch(req, res, next) {
     next();
 }
 
-module.exports = { authenticateToken, authorizeRole, checkUserIDMatch };
+module.exports = { authenticateToken, checkUserIDMatch };

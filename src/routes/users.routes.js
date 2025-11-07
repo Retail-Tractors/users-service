@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { authenticateToken, authorizeRole, checkUserIDMatch } = require("../middlewares/auth");
+const { authenticateToken, checkUserIDMatch } = require("../middlewares/auth");
 const usersController = require("../controllers/users.controller");
+const { authorizeRole } = require("../middlewares/check-role.js");
 
 router.get("/", authenticateToken, authorizeRole("admin"), usersController.listUser);
 router.post("/register", usersController.addUser);
