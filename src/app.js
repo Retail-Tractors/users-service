@@ -4,8 +4,6 @@ app.use(express.json());
 const logger = require("./utils/logger.js");
 // const swaggerUi = require("swagger-ui-express");
 // const swaggerFile = require("./swagger-output.json");
-const env = require("dotenv");
-env.config({ path: "../.env" });
 const { errorHandler } = require("./middlewares/error-handler");
 
 app.use("/users", require("./routes/users.routes"));
@@ -18,6 +16,5 @@ app.use((req, res, next) => {
 });
 
 app.use(errorHandler);
-
-app.listen(3003, () => logger.info("Users service running on port 3003"));
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+module.exports = app;
