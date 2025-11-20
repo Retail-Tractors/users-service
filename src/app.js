@@ -2,9 +2,11 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 const logger = require("./utils/logger.js");
-// const swaggerUi = require("swagger-ui-express");
-// const swaggerFile = require("./swagger-output.json");
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("../swagger-output.json");
 const { errorHandler } = require("./middlewares/error-handler");
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use("/users", require("./routes/users.routes"));
 
@@ -16,5 +18,4 @@ app.use((req, res, next) => {
 });
 
 app.use(errorHandler);
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 module.exports = app;
