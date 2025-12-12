@@ -225,4 +225,20 @@ router.delete("/:id",
   usersController.deleteUser
 );
 
+// Endpoint to verify jwt tokens at /auth/verify, used in nginx auth_request
+router.get("/auth/verify",
+  /*
+    #swagger.tags = ['Auth']
+    #swagger.description = 'Verify JWT token validity.'
+    #swagger.security = [{ BearerAuth: [] }]
+
+    #swagger.responses[200] = { description: 'Token is valid.' }
+    #swagger.responses[401] = { description: 'Missing or invalid token.' }
+  */
+  authenticateToken,
+  (req, res) => {
+    res.status(200).json({ message: "Token is valid." });
+  }
+);
+
 module.exports = router;
