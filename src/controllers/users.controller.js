@@ -16,7 +16,7 @@ async function encryptPassword(password) {
 
 async function listUser(req, res, next) {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({select: { id: true, name: true, email: true, role: true }});
     return res.status(200).json(users);
   } catch (error) {
     next(error);
@@ -93,7 +93,7 @@ async function editUser(req, res, next) {
       throw err;
     }
     // Check if user exists
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, email: true } });
     if (!user) {
       const err = new Error("User not found");
       err.statusCode = 404;
@@ -107,10 +107,7 @@ async function editUser(req, res, next) {
     }
     // Email uniqueness check and format
     if (updatedData.email) {
-      const emailExists = await prisma.user.findUnique({
-        where: { email: updatedData.email },
-      });
-      if (emailExists && emailExists.id !== userId) {
+      if ((updatedData.email==user.email) && emailExists.id !== userId) {
         const err = new Error("Email already exists");
         err.statusCode = 409;
         throw err;
@@ -154,7 +151,7 @@ async function changeUserRole(req, res, next) {
       throw err;
     }
     // Check if user exists
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
     if (!user) {
       const err = new Error("User not found");
       err.statusCode = 404;
@@ -177,7 +174,7 @@ async function deleteUser(req, res, next) {
     const userId = parseInt(req.params.id, 10);
 
     // Check if user exists
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
     if (!user) {
       const err = new Error("User not found");
       err.statusCode = 404;
@@ -200,7 +197,7 @@ async function login(req, res, next) {
       err.statusCode = 400;
       throw err;
     }
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, name: true, password: true } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       const err = new Error("Invalid email or password");
       err.statusCode = 401;
@@ -209,6 +206,7 @@ async function login(req, res, next) {
     const token = jwt.sign({
      id: user.id,
      email: user.email,
+     name: user.name,
      }, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
      res.json({ token });
   } catch (error) {
