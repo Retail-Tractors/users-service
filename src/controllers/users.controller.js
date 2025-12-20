@@ -32,6 +32,11 @@ async function getUser(req, res, next) {
       err.statusCode = 404;
       throw err;
     }
+
+    if (req.user.id !== userId && req.user.role !== "ADMIN") {
+        return res.status(403).json({ error: "Access forbidden: insufficient privileges." });
+    }
+
     return res.status(200).json({ data: user });
   } catch (error) {
     next(error);
@@ -66,16 +71,24 @@ async function addUser(req, res, next) {
     // Encrypt password
     newUser.password = await encryptPassword(newUser.password);
     // Create user
-    const user = await prisma.user.create({
-      data: {
-        name: newUser.name,
-        email: newUser.email,
-        password: newUser.password,
-        role: "USER",
-      },
-    });
-
-    return res.status(201).json({ data: user });
+    try {
+      const user = await prisma.user.create({
+        data: {
+          name: newUser.name,
+          email: newUser.email,
+          password: newUser.password,
+          role: "USER",
+        },
+      });
+      return res.status(201).json({ data: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        const err = new Error("Email already exists");
+        err.statusCode = 409;
+        throw err;
+      }
+      throw error;
+    }
   } catch (error) {
     next(error);
   }
@@ -99,6 +112,11 @@ async function editUser(req, res, next) {
       err.statusCode = 404;
       throw err;
     }
+
+    if (req.user.id !== userId && req.user.role !== "ADMIN") {
+        return res.status(403).json({ error: "Access forbidden: insufficient privileges." });
+    }
+
     // At least one updatable field required
     if (!updatedData.name && !updatedData.email) {
       const err = new Error("At least one field (name or email) must be provided");

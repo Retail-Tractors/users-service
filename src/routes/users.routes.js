@@ -1,21 +1,3 @@
-// const express = require("express");
-// const router = express.Router();
-// const { authenticateToken, checkUserIDMatch } = require("../middlewares/auth");
-// const usersController = require("../controllers/users.controller");
-// const { authorizeRole } = require("../middlewares/check-role.js");
-
-// router.get("/", authenticateToken, authorizeRole("admin"), usersController.listUser);
-// router.post("/register", usersController.addUser);
-// router.post("/login", usersController.login);
-// router.post("/forgot-password", usersController.forgotPassword);
-// router.post("/reset-password", usersController.resetPassword);
-// router.get("/:id", authenticateToken, checkUserIDMatch, usersController.getUser);
-// router.put("/:id", authenticateToken, checkUserIDMatch, usersController.editUser);
-// router.delete("/:id", authenticateToken, authorizeRole("admin"), usersController.deleteUser);
-// router.patch("/:id/role", authenticateToken, authorizeRole("admin"), usersController.changeUserRole);
-
-// module.exports = router;
-
 const express = require("express");
 const router = express.Router();
 const { authenticateToken, checkUserIDMatch } = require("../middlewares/auth");
@@ -37,7 +19,7 @@ router.get("/",
     #swagger.responses[403] = { description: 'User does not have ADMIN role.' }
   */
   authenticateToken,
-  authorizeRole("admin"),
+  authorizeRole("ADMIN"),
   usersController.listUser
 );
 
@@ -149,7 +131,6 @@ router.get("/:id",
     #swagger.responses[404] = { description: 'User not found.' }
   */
   authenticateToken,
-  checkUserIDMatch,
   usersController.getUser
 );
 
@@ -180,7 +161,6 @@ router.put("/:id",
     #swagger.responses[409] = { description: 'Email already exists.' }
   */
   authenticateToken,
-  checkUserIDMatch,
   usersController.editUser
 );
 
@@ -203,7 +183,7 @@ router.patch("/:id/role",
     #swagger.responses[404] = { description: 'User not found.' }
   */
   authenticateToken,
-  authorizeRole("admin"),
+  authorizeRole("ADMIN"),
   usersController.changeUserRole
 );
 
@@ -221,7 +201,7 @@ router.delete("/:id",
     #swagger.responses[404] = { description: 'User not found.' }
   */
   authenticateToken,
-  authorizeRole("admin"),
+  authorizeRole("ADMIN"),
   usersController.deleteUser
 );
 

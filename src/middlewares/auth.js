@@ -12,12 +12,5 @@ function authenticateToken(req, res, next) {
         next();
     });
 }
-function checkUserIDMatch(req, res, next) {
-    const userId = parseInt(req.params.id);
-    if (req.user.id !== userId) {
-        return res.status(403).json({ error: "Access forbidden: insufficient privileges." });
-    }
-    next();
-}
 
-module.exports = { authenticateToken, checkUserIDMatch };
+module.exports = { authenticateToken };
