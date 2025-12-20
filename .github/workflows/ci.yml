@@ -41,6 +41,4 @@ jobs:
           JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
           JWT_RESET_SECRET: ${{ secrets.JWT_RESET_SECRET }}
           JWT_RESET_SECRET_EXPIRATION: ${{ secrets.JWT_RESET_SECRET_EXPIRATION }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           PORT: ${{ secrets.PORT }}
