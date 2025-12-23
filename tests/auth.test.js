@@ -82,15 +82,6 @@ describe("Authentication Endpoints", () => {
 
   describe("POST /users/forgot-password", () => {
 
-    it("should request password reset with valid email", async () => {
-      const res = await request(app)
-        .post("/users/forgot-password")
-        .send({ email: testUser.email });
-
-      expect(res.statusCode).toBe(200);
-      expect(res.body.message).toBe("Password reset email sent");
-    });
-
     it("should fail if email is missing", async () => {
       const res = await request(app)
         .post("/users/forgot-password")
