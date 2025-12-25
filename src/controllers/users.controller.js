@@ -2,11 +2,44 @@ const prisma = require("../config/db"); // Import prisma instance
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const logger = require("../utils/logger");
+const fs = require("fs");
+const path = require("path");
 const { sendMail } = require("../services/mail-sender");
-const JWT_SECRET = process.env.JWT_SECRET;
+
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION;
 const JWT_RESET_SECRET = process.env.JWT_RESET_SECRET;
 const JWT_RESET_SECRET_EXPIRATION = process.env.JWT_RESET_SECRET_EXPIRATION;
+const privatekey = fs.readFileSync(path.join(__dirname, '..', '..', 'certs', 'jwt-private.pem'), 'utf8');
+
+async function login(req, res, next) {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      const err = new Error("Email and password are required");
+      err.statusCode = 400;
+      throw err;
+    }
+    const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, name: true, password: true } });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      const err = new Error("Invalid email or password");
+      err.statusCode = 401;
+      throw err;
+    }
+    const token = jwt.sign({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    }, privatekey, { 
+      expiresIn: JWT_EXPIRATION, 
+      algorithm: 'RS256',
+      keyid: 'retail-tractors-users-key'
+    });
+
+     res.json({ token });
+  } catch (error) {
+    next(error);
+  }
+}
 
 async function encryptPassword(password) {
   const saltRounds = 10;
@@ -202,31 +235,6 @@ async function deleteUser(req, res, next) {
     await prisma.user.delete({ where: { id: userId } });
     logger.info(`User deleted: ${userId} by admin: ${req.user.id}`);
     return res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function login(req, res, next) {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      const err = new Error("Email and password are required");
-      err.statusCode = 400;
-      throw err;
-    }
-    const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, name: true, password: true } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      const err = new Error("Invalid email or password");
-      err.statusCode = 401;
-      throw err;
-    }
-    const token = jwt.sign({
-     id: user.id,
-     email: user.email,
-     name: user.name,
-     }, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
-     res.json({ token });
   } catch (error) {
     next(error);
   }

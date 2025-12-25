@@ -36,3 +36,6 @@ coverage/
 Thumbs.db
 
 /src/prisma
+
+# Private keys (never commit)
+certs/jwt-private.pem
