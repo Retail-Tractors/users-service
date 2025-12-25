@@ -45,6 +45,12 @@ jobs:
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/testdb
 
+      - name: Generate JWT keys
+        run: |
+          mkdir -p certs
+          openssl genrsa -out certs/jwt-private.pem 2048
+          openssl rsa -in certs/jwt-private.pem -pubout -out certs/jwt-public.pem
+
       - name: Run tests
         run: npm test
         env:
