@@ -50,9 +50,7 @@ jobs:
 
       - name: Generate JWT keys
         run: |
-          mkdir -p certs
-          openssl genrsa -out certs/jwt-private.pem 2048
-          openssl rsa -in certs/jwt-private.pem -pubout -out certs/jwt-public.pem
+          node ./scripts/gen-keys.js
 
       - name: Run tests
         run: npm test
