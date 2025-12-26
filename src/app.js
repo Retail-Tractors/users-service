@@ -8,6 +8,8 @@ const { errorHandler } = require("./middlewares/error-handler");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
+app.use("/.well-known/jwks.json", require("./routes/jwks.routes"));
+
 app.use("/users", require("./routes/users.routes"));
 
 app.use((req, res, next) => {

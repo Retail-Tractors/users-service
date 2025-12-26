@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { authenticateToken, checkUserIDMatch } = require("../middlewares/auth");
+const { authenticateToken } = require("../middlewares/auth");
 const usersController = require("../controllers/users.controller");
+const authController = require("../controllers/auth.controller");
 const { authorizeRole } = require("../middlewares/check-role.js");
 
 router.get("/",
@@ -46,7 +47,7 @@ router.post("/register",
     #swagger.responses[400] = { description: 'Missing fields, weak password, or invalid email.' }
     #swagger.responses[409] = { description: 'Email already exists.' }
   */
-  usersController.addUser
+  authController.register
 );
 
 router.post("/login",
@@ -68,7 +69,7 @@ router.post("/login",
     #swagger.responses[400] = { description: 'Missing email or password.' }
     #swagger.responses[401] = { description: 'Invalid credentials.' }
   */
-  usersController.login
+  authController.login
 );
 
 router.post("/forgot-password",
@@ -85,7 +86,7 @@ router.post("/forgot-password",
     #swagger.responses[400] = { description: 'Invalid or missing email.' }
     #swagger.responses[404] = { description: 'User not found.' }
   */
-  usersController.forgotPassword
+  authController.forgotPassword
 );
 
 router.post("/reset-password",
@@ -106,7 +107,7 @@ router.post("/reset-password",
     #swagger.responses[400] = { description: 'Invalid token, expired token, or weak password.' }
     #swagger.responses[404] = { description: 'User not found.' }
   */
-  usersController.resetPassword
+  authController.resetPassword
 );
 
 router.get("/:id",

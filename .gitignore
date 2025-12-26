@@ -39,4 +39,6 @@ Thumbs.db
 /src/prisma
 
 # Keys
-certs/
+certs/*
+# Except to keep the folder structure
+!certs/.gitkeep
