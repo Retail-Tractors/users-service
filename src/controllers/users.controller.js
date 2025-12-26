@@ -1,6 +1,7 @@
 const prisma = require("../config/db"); // Import prisma instance
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const jose = require("jose");
+const { createPrivateKey } = require("crypto");
 const logger = require("../utils/logger");
 const fs = require("fs");
 const path = require("path");
@@ -9,7 +10,13 @@ const { sendMail } = require("../services/mail-sender");
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION;
 const JWT_RESET_SECRET = process.env.JWT_RESET_SECRET;
 const JWT_RESET_SECRET_EXPIRATION = process.env.JWT_RESET_SECRET_EXPIRATION;
-const privatekey = fs.readFileSync(path.join(__dirname, '..', '..', 'certs', 'jwt-private.pem'), 'utf8');
+
+// TODO: Rotate keys periodically in production
+const privateKeyPem = fs.readFileSync(
+  path.join(__dirname, "..", "..", "certs", "jwt-private.pem"),
+  "utf8"
+);
+const privateKey = createPrivateKey(privateKeyPem);
 
 async function login(req, res, next) {
   try {
@@ -25,15 +32,16 @@ async function login(req, res, next) {
       err.statusCode = 401;
       throw err;
     }
-    const token = jwt.sign({
+    const token = await new jose.SignJWT({
       id: user.id,
       email: user.email,
       name: user.name,
-    }, privatekey, { 
-      expiresIn: JWT_EXPIRATION, 
-      algorithm: 'RS256',
-      keyid: 'retail-tractors-users-key'
-    });
+    }).setProtectedHeader({ alg: 'RS256', kid: 'retail-tractors-users-key' })
+      .setExpirationTime(JWT_EXPIRATION)
+      .setIssuedAt()
+      .setAudience('retail-tractors-users')
+      .setIssuer('retail-tractors-users-service')
+      .sign(privateKey);
 
      res.json({ token });
   } catch (error) {
@@ -262,11 +270,14 @@ async function forgotPassword(req, res, next) {
       throw err;
     }
 
-    const resetToken = jwt.sign(
+    const resetToken = await new jose.SignJWT(
       { id: user.id, email: user.email },
-      JWT_RESET_SECRET,
-      { expiresIn: JWT_RESET_SECRET_EXPIRATION }
-    );
+    ).setProtectedHeader({ alg: 'HS256' })
+     .setExpirationTime(`${JWT_RESET_SECRET_EXPIRATION}m`)
+      .setIssuedAt()
+      .setAudience('retail-tractors-users')
+      .setIssuer('retail-tractors-users-service')
+      .sign(new TextEncoder().encode(JWT_RESET_SECRET)); 
 
     const expirationMinutes = new Date(Date.now() + JWT_RESET_SECRET_EXPIRATION * 60 * 1000);
 
