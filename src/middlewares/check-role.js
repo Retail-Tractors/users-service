@@ -3,7 +3,7 @@ const prisma = require("../config/db.js");
 function authorizeRole(role) {
   return async (req, res, next) => {
     try {
-      const userId = req.user.id;
+      const userId = parseInt(req.user.sub);
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true }

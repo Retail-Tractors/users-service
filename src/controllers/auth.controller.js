@@ -26,10 +26,10 @@ async function login(req, res, next) {
     const { privateKey, kid } = await getJwtKeyMaterial();
 
     const token = await new jose.SignJWT({
-      id: user.id,
       email: user.email,
       name: user.name,
-    }).setProtectedHeader({ alg: 'RS256', kid: `${kid}` })
+    }).setSubject(user.id.toString())
+      .setProtectedHeader({ alg: 'RS256', kid: `${kid}` })
       .setExpirationTime(JWT_EXPIRATION)
       .setIssuedAt()
       .setAudience('retail-tractors-users')

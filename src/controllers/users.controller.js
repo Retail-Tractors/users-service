@@ -20,7 +20,7 @@ async function getUser(req, res, next) {
       throw err;
     }
 
-    if (req.user.id !== userId && req.user.role !== "ADMIN") {
+    if (parseInt(req.user.sub) !== userId && req.user.role !== "ADMIN") {
         return res.status(403).json({ error: "Access forbidden: insufficient privileges." });
     }
 
@@ -49,7 +49,7 @@ async function editUser(req, res, next) {
       throw err;
     }
 
-    if (req.user.id !== userId && req.user.role !== "ADMIN") {
+    if (parseInt(req.user.sub) !== userId && req.user.role !== "ADMIN") {
         return res.status(403).json({ error: "Access forbidden: insufficient privileges." });
     }
 
@@ -84,7 +84,7 @@ async function editUser(req, res, next) {
       data: prismaData,
     });
     
-    logger.info(`User updated: ${userId} by user: ${req.user.id}`);
+    logger.info(`User updated: ${userId} by user: ${parseInt(req.user.sub)}`);
     return res.status(200).json({ data: updatedUser });
   } catch (error) {
     next(error);
@@ -117,7 +117,7 @@ async function changeUserRole(req, res, next) {
       where: { id: userId },
       data: { role: role.toUpperCase() },
     });
-    logger.info(`User role changed: ${userId} to ${role.toUpperCase()}\n by admin: ${req.user.id}`);
+    logger.info(`User role changed: ${userId} to ${role.toUpperCase()}\n by admin: ${parseInt(req.user.sub)}`);
     return res.status(200).json({ data: updatedUser });
   } catch (error) {
     next(error);
@@ -137,7 +137,7 @@ async function deleteUser(req, res, next) {
     }
 
     await prisma.user.delete({ where: { id: userId } });
-    logger.info(`User deleted: ${userId} by admin: ${req.user.id}`);
+    logger.info(`User deleted: ${userId} by admin: ${parseInt(req.user.sub)}`);
     return res.status(204).send();
   } catch (error) {
     next(error);

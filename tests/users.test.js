@@ -31,13 +31,13 @@ describe("Users CRUD endpoints", () => {
 
     // Create normal user
     const userRes = await request(app)
-      .post("/users/register")
+      .post("/auth/register")
       .send(userData);
     userId = userRes.body.data.id;
 
     // Create admin user
     const adminRes = await request(app)
-      .post("/users/register")
+      .post("/auth/register")
       .send(adminData);
     adminId = adminRes.body.data.id;
 
@@ -49,13 +49,13 @@ describe("Users CRUD endpoints", () => {
 
     // Login both
     const userLogin = await request(app)
-      .post("/users/login")
+      .post("/auth/login")
       .send({ email: userData.email, password: userData.password });
 
     userToken = userLogin.body.token;
 
     const adminLogin = await request(app)
-      .post("/users/login")
+      .post("/auth/login")
       .send({ email: adminData.email, password: adminData.password });
 
     adminToken = adminLogin.body.token;
