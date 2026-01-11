@@ -5,6 +5,7 @@
   "scripts": {
     "test": "jest",
     "dev": "cross-env NODE_ENV=dev nodemon server.js",
+    "prestart": "prisma generate",
     "start": "node server.js"
   },
   "keywords": [],
