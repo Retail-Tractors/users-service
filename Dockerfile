@@ -13,4 +13,4 @@ COPY . .
 EXPOSE 3003
 
 # Start the service
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma generate && node server.js"]
