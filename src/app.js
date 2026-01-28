@@ -6,11 +6,11 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("../swagger-output.json");
 const { errorHandler } = require("./middlewares/error-handler");
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-
 app.use("/.well-known/jwks.json", require("./routes/jwks.routes"));
 
 app.use("/auth", require("./routes/auth.routes"));
+
+app.use("/users/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use("/users", require("./routes/users.routes"));
 

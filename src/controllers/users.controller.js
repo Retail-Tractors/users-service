@@ -12,7 +12,11 @@ async function listUser(req, res, next) {
 
 async function getUser(req, res, next) {
   try {
-    const userId = parseInt(req.params.id, 10);
+    const userId = Number(req.params.id);
+    if (!Number.isInteger(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       const err = new Error("User not found");
@@ -32,7 +36,10 @@ async function getUser(req, res, next) {
 
 async function editUser(req, res, next) {
   try {
-    const userId = parseInt(req.params.id, 10);
+    const userId = Number(req.params.id);
+    if (!Number.isInteger(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
     const updatedData = req.body;
 
     // Check if user is trying to change role
@@ -93,7 +100,10 @@ async function editUser(req, res, next) {
 
 async function changeUserRole(req, res, next) {
   try {
-    const userId = parseInt(req.params.id, 10);
+    const userId = Number(req.params.id);
+    if (!Number.isInteger(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
     const { role } = req.body;
     if (!role) {
       const err = new Error("Role is required");
@@ -126,7 +136,10 @@ async function changeUserRole(req, res, next) {
 
 async function deleteUser(req, res, next) {
   try {
-    const userId = parseInt(req.params.id, 10);
+    const userId = Number(req.params.id);
+    if (!Number.isInteger(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
 
     // Check if user exists
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
